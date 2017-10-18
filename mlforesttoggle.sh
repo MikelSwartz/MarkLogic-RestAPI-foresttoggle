@@ -51,37 +51,37 @@ if [[ ! $HOST || ! $DB1 || ! $DB2 || ! $USER || ! $PASS ]]
     echo "Argument missing"
     display_usage
 fi
-DB1_Forests=$(curl -s -X GET  --anyauth -u admin:$(cat pass) http://${HOST}:8002/manage/v2/databases/${DB1}/properties |\
+DB1_Forests=$(curl -s -X GET  --anyauth -u $USER:$PASS http://${HOST}:8002/manage/v2/databases/${DB1}/properties |\
     grep "<forest>.*</forest>" |\
     awk -F'[<>]' '{print $3}')
-DB2_Forests=$(curl -s -X GET  --anyauth -u admin:$(cat pass) http://${HOST}:8002/manage/v2/databases/${DB2}/properties |\
+DB2_Forests=$(curl -s -X GET  --anyauth -u $USER:$PASS http://${HOST}:8002/manage/v2/databases/${DB2}/properties |\
     grep "<forest>.*</forest>" |\
     awk -F'[<>]' '{print $3}')
 
 for i in $DB1_Forests
  do
-   curl -s --anyauth -u admin:$(cat pass) -X POST -i \
+   curl -s --anyauth -u $USER:$PASS -X POST -i \
     -d "state=detach" -d "database=${DB1}" \
     -H "Content-type: application/x-www-form-urlencoded" \
     http://${HOST}:8002/manage/v2/forests/${i}
 done
 for i in $DB2_Forests
  do
-   curl -s --anyauth -u admin:$(cat pass) -X POST -i \
+   curl -s --anyauth -u $USER:$PASS -X POST -i \
     -d "state=detach" -d "database=${DB2}" \
     -H "Content-type: application/x-www-form-urlencoded" \
     http://${HOST}:8002/manage/v2/forests/${i}
 done
 for i in $DB1_Forests
  do
-   curl -s --anyauth -u admin:$(cat pass) -X POST -i \
+   curl -s --anyauth -u $USER:$PASS -X POST -i \
     -d "state=attach" -d "database=${DB2}" \
     -H "Content-type: application/x-www-form-urlencoded" \
     http://${HOST}:8002/manage/v2/forests/${i}
 done
 for i in $DB2_Forests
  do
-   curl -s --anyauth -u admin:$(cat pass) -X POST -i \
+   curl -s --anyauth -u $USER:$PASS -X POST -i \
     -d "state=attach" -d "database=${DB1}" \
     -H "Content-type: application/x-www-form-urlencoded" \
     http://${HOST}:8002/manage/v2/forests/${i}
